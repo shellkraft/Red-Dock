@@ -52,10 +52,10 @@ sudo chmod +x /usr/local/bin/rd
 echo -e "${GREEN}[*] Updating the image (This might take a while)...${NC}"
 CONTAINER_ID=$(sudo docker ps --format "{{.ID}}" --filter "name=kali")
 sudo docker commit "$CONTAINER_ID" kali
-echo -e "${GREEN}[*] Update successful.${NC}"
+echo -e "${GREEN}[+] Update successful.${NC}"
 sudo docker rm kali
 
-echo -e "${GREEN}[*] Installation completed${NC}"
+echo -e "${GREEN}[+] Installation completed${NC}"
 sleep 1
 echo -e "${GREEN}[*] Starting Red Dock in 2 seconds...${NC}"
 
