@@ -4,6 +4,11 @@ GREEN='\033[0;32m'
 NC='\033[0m' 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
+if [[ $EUID -ne 0 ]]; then
+    echo "[-] Error: This script must be run as root." 
+    exit 1
+fi
+
 if command -v docker &> /dev/null; then
     echo "[+] Docker is installed on this system."
 else
