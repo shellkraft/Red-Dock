@@ -27,7 +27,7 @@ Execute the `install.sh` script to initiate the automated installation process.
 ```bash
 rd start
 ```
-This command initiates the Kali Linux Docker container while also establishing a volume for persistence.
+This command initiates the Kali Linux Docker container, attaching a volume for persistence and mounting it as `/vol`.
 
 ### Halt Kali Linux Container
 
