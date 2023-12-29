@@ -27,7 +27,17 @@ def start_container():
 
 
 def stop_container():
-    subprocess.run(["sudo", "docker", "rm", "kali"])
+    all_containers = subprocess.check_output(["sudo", "docker", "ps", "-qa"]).decode("utf-8").splitlines()
+
+    if not all_containers:
+        print("Error: No containers are currently running.")
+    else:
+        running_containers = subprocess.check_output(["sudo", "docker", "ps", "-q"]).decode("utf-8").splitlines()
+        for container_id in running_containers:
+            subprocess.run(["sudo", "docker", "kill", container_id])
+
+        subprocess.run(["sudo", "docker", "stop"] + all_containers)
+        subprocess.run(["sudo", "docker", "rm"] + all_containers)
 
 
 def show_status():
@@ -60,6 +70,26 @@ def attach_container():
         print("Error: No containers are currently running.")
 
 
+def get_next_container_name(base_name="kali"):
+    existing_containers = subprocess.check_output(["sudo", "docker", "ps", "--format", "{{.Names}}"]).decode(
+        "utf-8").splitlines()
+
+    index = 2
+    while True:
+        new_name = f"{base_name}{index}"
+        if new_name not in existing_containers:
+            return new_name
+        index += 1
+
+
+def clone_container():
+    new_container_name = get_next_container_name()
+
+    subprocess.run(
+        ["sudo", "docker", "run", "--name", new_container_name, "--mount", "source=pentest,target=/vol", "-it", "kali",
+         "/bin/bash"])
+
+
 def parser_error(errmsg):
     banner()
     print("Usage: python3 " + sys.argv[0] + " [Options] use -h for help")
@@ -77,11 +107,10 @@ def main():
     parser.add_argument("status", nargs="?", help="Check the container status.")
     parser.add_argument("update", nargs="?", help="Update the Kali image.")
     parser.add_argument("attach", nargs="?", help="Attach a container if running.")
+    parser.add_argument("clone", nargs="?", help="Open another terminal.")
     parser.add_argument("cp", nargs="?", help="Copy files to & fro the host machine.")
     parser.add_argument("source", nargs="?", help="Source file or directory for the 'cp' command.")
     parser.add_argument("destination", nargs="?", help="Destination path for the 'cp' command.")
-
-
 
     args = parser.parse_args()
 
@@ -91,6 +120,8 @@ def main():
         stop_container()
     elif args.command == "attach":
         attach_container()
+    elif args.command == "clone":
+        clone_container()
     elif args.command == "status":
         show_status()
     elif args.command == "update":
