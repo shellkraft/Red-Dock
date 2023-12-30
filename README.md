@@ -22,19 +22,19 @@ Execute the `install.sh` script to initiate the automated installation process.
 ---
 ## Usage
 
-### Launch Kali Linux Container
+### Launch the container
 
 ```bash
 rd start
 ```
 This command initiates the Kali Linux Docker container, attaching a volume for persistence and mounting it as `/vol`.
 
-### Halt Kali Linux Container
+### Stop all container instances
 
 ```bash
 rd stop
 ```
-Cease and remove the actively running Kali Linux Docker container.
+Cease and remove all actively running containers.
 
 ### Check Container Status
 
@@ -48,21 +48,14 @@ View the status of Docker containers.
 ```bash
 rd update
 ```
-Update the Kali Linux Docker image by committing changes from the running container.
+Update the Kali Linux Docker image by committing changes from the container.
 
 ### Transfer Files to/from Container
 
 ```bash
 rd cp <path-to-file> <path-to-copy>
 ```
-Facilitate file transfer between the Kali Linux Docker container and the host machine.
-
-### Connect to Container
-
-```bash
-rd attach
-```
-Connect to the running Kali Linux Docker container. If the container is not running, it will be initiated automatically.
+Transfer files between the volume and the host machine.
 
 ---
 ### Installed Tools
