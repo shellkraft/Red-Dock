@@ -21,7 +21,7 @@ def banner():
                                     
     print(whale_art)
     print(f"        {RED}RED {BLUE}DOCK")
-    print(f"        {YELLOW}by B4PHOM3T{RESET}")
+    print(f"        {YELLOW}by shellkraft{RESET}")
 
 
 def start_container():
