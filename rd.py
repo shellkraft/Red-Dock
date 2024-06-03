@@ -36,8 +36,7 @@ def start_container():
         subprocess.run(["sudo", "docker", "attach", container_id])         
     else:
         subprocess.run(
-            ["sudo", "docker", "run", "--name", "kali", "--mount", "source=pentest,target=/vol", "-it", "kali",
-             "/bin/bash"])
+            ["sudo", "docker", "run", "--name", "kali", "--mount", "source=pentest,target=/vol", "--mount", "type=bind,source=/home/sysploit/,target=/mnt/sysploit", "-it", "--network", "host", "kali", "/bin/bash"])
 
 def stop_container():
     all_containers = subprocess.check_output(["sudo", "docker", "ps", "-qa"]).decode("utf-8").splitlines()
@@ -59,15 +58,6 @@ def update_image():
     container_id = subprocess.check_output(["sudo", "docker", "ps", "-q", "-n", "1"]).decode("utf-8").strip()
     subprocess.run(["sudo", "docker", "commit", container_id, "kali"])
 
-def copy_files(source, destination):
-    container_id = subprocess.check_output(["sudo", "docker", "ps", "-q", "-n", "1"]).decode("utf-8").strip()
-
-    if destination.startswith("/vol/"):
-        # Copy from host to container
-        subprocess.run(["sudo", "docker", "cp", source, f"{container_id}:{destination}"])
-    else:
-        # Copy from container to host
-        subprocess.run(["sudo", "docker", "cp", f"{container_id}:{source}", destination])
 
 
 def get_next_container_name(base_name="kali"):
@@ -85,7 +75,7 @@ def clone_container():
     new_container_name = get_next_container_name()
 
     subprocess.run(
-        ["sudo", "docker", "run", "--name", new_container_name, "--mount", "source=pentest,target=/vol", "-it", "kali",
+        ["sudo", "docker", "run", "--name", new_container_name, "--mount", "source=pentest,target=/vol", "-it", "--network", "host", "kali",
          "/bin/bash"])
 
 def print_help_menu():
@@ -97,10 +87,7 @@ def print_help_menu():
     {BOLD}stop{RESET}                   {WHITE}Stop a running container.{RESET}
     {BOLD}status{RESET}                 {WHITE}Check the container status.{RESET}
     {BOLD}update{RESET}                 {WHITE}Update the Kali image.{RESET}
-    {BOLD}clone{RESET}                  {WHITE}Open another terminal.{RESET}
-    
-    {BOLD}{GREEN}FILE OPERATIONS:{RESET}
-    {BOLD}cp <source> <destination>{RESET}    {WHITE}Copy files from host to container or vice versa.{RESET}
+    {BOLD}clone{RESET}                  {WHITE}Open another terminal.{RESET} 
 
     {BOLD}{GREEN}EXAMPLES:{RESET}
     rd start
@@ -108,8 +95,6 @@ def print_help_menu():
     rd status
     rd update
     rd clone
-    rd cp /path/to/source /vol/destination
-    rd cp /vol/source /path/to/destination
     """
     print(help_menu)
 
@@ -118,7 +103,7 @@ def main():
         print_help_menu()
         sys.exit()
 
-    if len(sys.argv) == 1 or sys.argv[1] not in ["start", "stop", "clone", "status", "update", "cp"]:
+    if len(sys.argv) == 1 or sys.argv[1] not in ["start", "stop", "clone", "status", "update"]:
         banner()
         print(f"{RED}Error: Unknown command. Use -h for help.{RESET}")
         sys.exit()
@@ -135,13 +120,7 @@ def main():
         show_status()
     elif command == "update":
         update_image()
-    elif command == "cp":
-        if len(sys.argv) != 4:
-            print(f"{RED}Error: Please provide source and destination arguments for 'cp' command.{RESET}")
-            sys.exit()
-        source = sys.argv[2]
-        destination = sys.argv[3]
-        copy_files(source, destination)
+
 
 if __name__ == "__main__":
     main()
